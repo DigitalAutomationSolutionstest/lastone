@@ -1,9 +1,10 @@
-/** @type {import('postcss').Config} */
+
+}
 module.exports = {
   plugins: {
     'postcss-import': {},
-    'tailwindcss/nesting': {},
-    tailwindcss: {},
+    'postcss-nesting': {},
+    '@tailwindcss/postcss': {},  // ✅ usa il nuovo pacchetto!
     autoprefixer: {},
   },
-} 
+}
