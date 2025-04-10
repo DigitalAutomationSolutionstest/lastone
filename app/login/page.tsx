@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { ButtonModern } from '@/components/ui/button-modern'
 import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase-client'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,7 +13,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClientComponentClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,7 +34,7 @@ export default function LoginPage() {
       router.refresh()
     } catch (err) {
       setError('Si è verificato un errore durante il login')
-      console.error(err)
+      console.error('Login error:', err)
     } finally {
       setIsLoading(false)
     }
@@ -62,61 +61,43 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
                 Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background"
                   placeholder="nome@esempio.com"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background"
                   placeholder="••••••••"
                   required
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <Link href="/reset-password" className="text-primary hover:underline">
-                Password dimenticata?
-              </Link>
-              <Link href="/register" className="text-primary hover:underline">
-                Crea un account
-              </Link>
-            </div>
-
-            <ButtonModern
-              type="submit"
-              className="w-full"
-              isLoading={isLoading}
-              disabled={isLoading}
-            >
+            <ButtonModern type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -127,6 +108,13 @@ export default function LoginPage() {
               )}
             </ButtonModern>
           </form>
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Non hai un account?{' '}
+            <Link href="/register" className="text-primary hover:underline">
+              Registrati
+            </Link>
+          </p>
         </div>
       </div>
     </div>

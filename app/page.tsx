@@ -10,7 +10,7 @@ import { Modal } from '@/components/ui/modal'
 import { TabsContent } from '@/components/ui/tabs-content'
 import { useTheme } from 'next-themes'
 import { useToast } from '@/hooks/use-toast'
-import { Toaster } from '@/components/ui/toast'
+import { Toaster } from '@/components/ui/toaster'
 import {
   ArrowRight,
   Check,
@@ -447,7 +447,8 @@ export default function HomePage() {
         </div>
       </footer>
 
-      <Toaster toasts={toasts} />
+      <Toaster />
     </>
   )
-} 
+}
+ 

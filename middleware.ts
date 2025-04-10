@@ -1,32 +1,29 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-
-  // Rinnova la sessione se esiste
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  // Se la richiesta è per un'API protetta
-  if (req.nextUrl.pathname.startsWith('/api/tools')) {
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Non autorizzato' },
-        { status: 401 }
-      )
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get: (name) => req.cookies.get(name)?.value,
+        set: (name, value, options) => {
+          res.cookies.set({ name, value, ...options })
+        },
+        remove: (name, options) => {
+          res.cookies.set({ name, value: '', ...options })
+        },
+      },
     }
-  }
+  )
+  const { data } = await supabase.auth.getSession()
 
+  if (!data.session) return NextResponse.redirect(new URL('/login', req.url))
   return res
 }
 
 export const config = {
-  matcher: [
-    '/api/tools/:path*',
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/dashboard/:path*'],
 } 

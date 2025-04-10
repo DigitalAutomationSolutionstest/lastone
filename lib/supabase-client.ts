@@ -1,10 +1,15 @@
-import { createClient } from '@supabase/supabase-js'
-import { UserCredits } from './types'
+import { createBrowserClient } from '@supabase/ssr'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+export const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export interface UserCredits {
+  user_id: string
+  credits: number
+  updated_at: string
+}
 
 export async function getUserCredits(userId: string): Promise<UserCredits | null> {
   const { data, error } = await supabase

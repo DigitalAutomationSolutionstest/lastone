@@ -1,7 +1,15 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import type { Toast } from '@/components/ui/toast'
+
+// Definisci esplicitamente l'interfaccia Toast
+export interface Toast {
+  id: string
+  title?: string
+  description?: string
+  duration?: number
+  onClose: () => void
+}
 
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([])

@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { ButtonModern } from '@/components/ui/button-modern'
 import { Mail, Lock, User, Loader2, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase-client'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -14,7 +14,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClientComponentClient()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,7 +21,6 @@ export default function RegisterPage() {
     setError(null)
 
     try {
-      // Registra l'utente
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -38,13 +36,12 @@ export default function RegisterPage() {
         return
       }
 
-      // Crea il profilo utente con crediti iniziali
       if (data.user) {
         const { error: profileError } = await supabase
           .from('user_credits')
           .insert({
             user_id: data.user.id,
-            credits: 3, // Crediti gratuiti iniziali
+            credits: 3,
           })
 
         if (profileError) {
@@ -83,82 +80,61 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleRegister} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium">
                 Nome
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background"
                   placeholder="Il tuo nome"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">
                 Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background"
                   placeholder="nome@esempio.com"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-input bg-background"
                   placeholder="••••••••"
                   required
-                  minLength={6}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                La password deve essere di almeno 6 caratteri
-              </p>
             </div>
 
-            <div className="text-sm text-center">
-              <Link href="/login" className="text-primary hover:underline">
-                Hai già un account? Accedi
-              </Link>
-            </div>
-
-            <ButtonModern
-              type="submit"
-              className="w-full"
-              isLoading={isLoading}
-              disabled={isLoading}
-            >
+            <ButtonModern type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -169,6 +145,13 @@ export default function RegisterPage() {
               )}
             </ButtonModern>
           </form>
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Hai già un account?{' '}
+            <Link href="/login" className="text-primary hover:underline">
+              Accedi
+            </Link>
+          </p>
         </div>
       </div>
     </div>
